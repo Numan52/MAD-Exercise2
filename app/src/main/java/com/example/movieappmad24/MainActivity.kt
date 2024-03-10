@@ -100,6 +100,7 @@ fun MovieAppContent(movieList: List<Movie>) {
 @Composable
 fun BottomAppBar() {
     BottomAppBar(
+        containerColor = Color(106, 235, 205, 255),
         modifier = Modifier.fillMaxWidth(),
         content = {
 
