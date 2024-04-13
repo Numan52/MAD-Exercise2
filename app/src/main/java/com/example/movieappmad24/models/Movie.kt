@@ -3,6 +3,7 @@ package com.example.movieappmad24.models
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.movieappmad24.R
 
 data class Movie(
     val id: String,
@@ -14,8 +15,7 @@ data class Movie(
     val plot: String,
     val images: List<String>,
     val trailer: String,
-    val rating: String
-,
+    val rating: String,
     val initialIsFavorite: Boolean = false
 ) {
     var isFavorite by mutableStateOf(initialIsFavorite)
@@ -96,6 +96,7 @@ fun getMovies(): List<Movie> {
                 "https://images-na.ssl-images-amazon.com/images/M/MV5BNjYzNjE2NDk3N15BMl5BanBnXkFtZTgwNzEyODgxMzE@._V1_SX1500_CR0,0,1500,999_AL_.jpg"),
             trailer = "trailer_placeholder",
             rating = "8.6"),
+
         Movie(id = "tt0944947",
             title = "Game of Thrones",
             year = "2011 - 2018",

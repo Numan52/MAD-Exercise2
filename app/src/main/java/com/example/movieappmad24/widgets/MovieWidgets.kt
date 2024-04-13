@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,31 +41,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.example.movieappmad24.R
 import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
 import com.example.movieappmad24.navigation.Screen
 import com.example.movieappmad24.viewmodels.MoviesViewModel
+import java.lang.Exception
 
 
 @Composable
 fun MovieList(
     modifier: Modifier,
-    movies: List<Movie> = getMovies(),
+    movies: List<Movie>,
     navController: NavController,
     viewModel: MoviesViewModel
 ){
     LazyColumn(modifier = modifier) {
-        items(viewModel.movies) { movie ->
+        items(movies) { movie ->
             MovieRow(
                 movie = movie,
                 onFavoriteClick = {movieId ->
@@ -141,11 +152,74 @@ fun MovieImage(imageUrl: String){
     )
 }
 
+
+@Composable
+fun MovieTrailer(movieTrailer: String){
+    var lifecycle by remember {
+        mutableStateOf(Lifecycle.Event.ON_CREATE)
+    }
+    val context = LocalContext.current
+    val mediaItem =
+        MediaItem.fromUri(
+            "android.resource://${context.packageName}/$movieTrailer"
+        )
+
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(mediaItem)
+            prepare()
+        }
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            lifecycle = event
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            exoPlayer.release()
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    var wasplaying by remember {
+        mutableStateOf(false)
+    }
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(16f / 9f),
+        factory = {
+            PlayerView(context).also { playerView ->
+                playerView.player = exoPlayer
+            }
+        },
+        update = {
+            when (lifecycle) {
+                Lifecycle.Event.ON_RESUME -> { //going back to app
+                    it.onResume()
+                    //check if video was playing and is not currently playing
+                    if(wasplaying && exoPlayer.isPlaying.not()) { it.player?.playWhenReady = true }
+                }
+
+                Lifecycle.Event.ON_PAUSE -> { //leaving app
+                    it.onPause()
+                    wasplaying = exoPlayer.isPlaying //check if video was playing
+                    it.player?.pause() //pause video
+                }
+                else -> Unit
+            }
+        }
+    )
+}
+
 @Composable
 fun FavoriteIcon(
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit = {}
 ) {
+    println(isFavorite)
     Box(
         modifier = Modifier
             .fillMaxSize()

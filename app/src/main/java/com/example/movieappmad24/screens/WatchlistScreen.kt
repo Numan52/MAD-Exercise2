@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
 import com.example.movieappmad24.viewmodels.MoviesViewModel
 import com.example.movieappmad24.widgets.MovieList
@@ -29,7 +30,7 @@ fun WatchlistScreen(
 
         MovieList(
             modifier = Modifier.padding(innerPadding),
-            movies = getMovies(),
+            movies = moviesViewModel.movies.filter { movie: Movie -> movie.isFavorite },
             navController = navController,
             viewModel = moviesViewModel
         )
