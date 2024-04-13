@@ -154,59 +154,56 @@ fun MovieImage(imageUrl: String){
 
 
 @Composable
-fun MovieTrailer(movieTrailer: String){
+fun MovieTrailer(movieTrailer: String) {
     var lifecycle by remember {
         mutableStateOf(Lifecycle.Event.ON_CREATE)
     }
     val context = LocalContext.current
-    val mediaItem =
-        MediaItem.fromUri(
-            "android.resource://${context.packageName}/$movieTrailer"
-        )
+
+    val mediaItem = MediaItem.fromUri(
+        "android.resource://${context.packageName}/${movieTrailer}"
+    )
+
+    println("mediaId ${movieTrailer}")
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(mediaItem)
             prepare()
+            playWhenReady = true
         }
     }
+    println("exoPlayer.mediaItemCount: ${exoPlayer.mediaItemCount}")
+
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             lifecycle = event
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-
         onDispose {
             exoPlayer.release()
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-
-    var wasplaying by remember {
-        mutableStateOf(false)
-    }
-    AndroidView(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(16f / 9f),
+    AndroidView(modifier = Modifier
+        .fillMaxWidth()
+        .aspectRatio(18f / 9f),
         factory = {
             PlayerView(context).also { playerView ->
                 playerView.player = exoPlayer
             }
         },
         update = {
-            when (lifecycle) {
-                Lifecycle.Event.ON_RESUME -> { //going back to app
-                    it.onResume()
-                    //check if video was playing and is not currently playing
-                    if(wasplaying && exoPlayer.isPlaying.not()) { it.player?.playWhenReady = true }
-                }
+            when(lifecycle) {
 
-                Lifecycle.Event.ON_PAUSE -> { //leaving app
+                Lifecycle.Event.ON_RESUME -> {
+                    it.onResume()
+
+                }
+                Lifecycle.Event.ON_PAUSE -> {
                     it.onPause()
-                    wasplaying = exoPlayer.isPlaying //check if video was playing
-                    it.player?.pause() //pause video
+                    it.player?.pause()
                 }
                 else -> Unit
             }
