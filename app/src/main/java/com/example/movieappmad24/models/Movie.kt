@@ -20,7 +20,7 @@ data class Movie(
     @Ignore val images: List<String>,
     val trailer: String,
     val rating: String,
-    val isFavorite: Boolean = false
+    var isFavorite: Boolean = false
 )
 
 fun getMovies(): List<Movie> {
