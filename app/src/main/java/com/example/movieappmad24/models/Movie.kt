@@ -10,7 +10,7 @@ import com.example.movieappmad24.R
 
 @Entity
 data class Movie(
-    @PrimaryKey val id: String,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val title: String,
     val year: String,
     val genre: String,
@@ -25,7 +25,7 @@ data class Movie(
 
 fun getMovies(): List<Movie> {
     return listOf(
-        Movie(id = "tt0499549",
+        Movie(
             title = "Avatar",
             year = "2009",
             genre = "Action, Adventure, Fantasy",
@@ -40,7 +40,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "7.9"),
 
-        Movie(id = "tt0416449",
+        Movie(
             title = "300",
             year = "2006",
             genre = "Action, Drama, Fantasy",
@@ -54,7 +54,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "7.7"),
 
-        Movie(id = "tt0848228",
+        Movie(
             title = "The Avengers",
             year = "2012",
             genre = "Action, Sci-Fi, Thriller",
@@ -69,7 +69,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "8.1"),
 
-        Movie(id = "tt0993846",
+        Movie(
             title = "The Wolf of Wall Street",
             year = "2013",
             genre = "Biography, Comedy, Crime",
@@ -84,7 +84,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "8.2"),
 
-        Movie(id = "tt0816692",
+        Movie(
             title = "Interstellar",
             year = "2014",
             genre = "Adventure, Drama, Sci-Fi",
@@ -99,7 +99,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "8.6"),
 
-        Movie(id = "tt0944947",
+        Movie(
             title = "Game of Thrones",
             year = "2011 - 2018",
             genre = "Adventure, Drama, Fantasy",
@@ -115,7 +115,7 @@ fun getMovies(): List<Movie> {
             rating = "9.5"),
 
 
-        Movie(id = "tt2306299",
+        Movie(
             title = "Vikings",
             year = "2013–2020",
             genre = "Action, Drama, History",
@@ -130,7 +130,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "9.5"),
 
-        Movie(id = "tt0903747",
+        Movie(
             title = "Breaking Bad",
             year = "2008–2013",
             genre = "Crime, Drama, Thriller",
@@ -145,7 +145,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "9.5"),
 
-        Movie(id = "tt2707408",
+        Movie(
             title = "Narcos",
             year = "2015-",
             genre = "Biography, Crime, Drama",

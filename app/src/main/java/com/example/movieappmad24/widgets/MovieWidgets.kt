@@ -92,8 +92,8 @@ fun MovieList(
 fun MovieRow(
     modifier: Modifier = Modifier,
     movie: Movie,
-    onFavoriteClick: (String) -> Unit = {},
-    onItemClick: (String) -> Unit = {}
+    onFavoriteClick: (Long) -> Unit = {},
+    onItemClick: (Long) -> Unit = {}
 ){
     Card(modifier = modifier
         .fillMaxWidth()
