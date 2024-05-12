@@ -6,26 +6,37 @@ import androidx.compose.runtime.setValue
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.example.movieappmad24.R
 
 @Entity
 data class Movie(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true)
+    val dbId: Long = 0,
+    val id: String,
     val title: String,
     val year: String,
     val genre: String,
     val director: String,
     val actors: String,
     val plot: String,
-    @Ignore val images: List<String>,
+    @Ignore
+    val images: List<String>,
     val trailer: String,
     val rating: String,
     var isFavorite: Boolean = false
-)
+) {
+    constructor(
+        dbId: Long, id: String, title: String, year: String, genre: String, director: String,
+        actors: String, plot: String, trailer: String, rating: String, isFavorite: Boolean
+    ) : this(dbId, id, title, year, genre, director, actors, plot, listOf(), trailer, rating, isFavorite)
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
+}
 
 fun getMovies(): List<Movie> {
     return listOf(
-        Movie(
+        Movie(id = "tt0499549",
             title = "Avatar",
             year = "2009",
             genre = "Action, Adventure, Fantasy",
@@ -40,7 +51,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "7.9"),
 
-        Movie(
+        Movie(id = "tt0416449",
             title = "300",
             year = "2006",
             genre = "Action, Drama, Fantasy",
@@ -54,7 +65,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "7.7"),
 
-        Movie(
+        Movie(id = "tt0848228",
             title = "The Avengers",
             year = "2012",
             genre = "Action, Sci-Fi, Thriller",
@@ -69,7 +80,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "8.1"),
 
-        Movie(
+        Movie(id = "tt0993846",
             title = "The Wolf of Wall Street",
             year = "2013",
             genre = "Biography, Comedy, Crime",
@@ -84,7 +95,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "8.2"),
 
-        Movie(
+        Movie(id = "tt0816692",
             title = "Interstellar",
             year = "2014",
             genre = "Adventure, Drama, Sci-Fi",
@@ -98,8 +109,7 @@ fun getMovies(): List<Movie> {
                 "https://images-na.ssl-images-amazon.com/images/M/MV5BNjYzNjE2NDk3N15BMl5BanBnXkFtZTgwNzEyODgxMzE@._V1_SX1500_CR0,0,1500,999_AL_.jpg"),
             trailer = "trailer_placeholder",
             rating = "8.6"),
-
-        Movie(
+        Movie(id = "tt0944947",
             title = "Game of Thrones",
             year = "2011 - 2018",
             genre = "Adventure, Drama, Fantasy",
@@ -115,7 +125,7 @@ fun getMovies(): List<Movie> {
             rating = "9.5"),
 
 
-        Movie(
+        Movie(id = "tt2306299",
             title = "Vikings",
             year = "2013–2020",
             genre = "Action, Drama, History",
@@ -130,7 +140,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "9.5"),
 
-        Movie(
+        Movie(id = "tt0903747",
             title = "Breaking Bad",
             year = "2008–2013",
             genre = "Crime, Drama, Thriller",
@@ -145,7 +155,7 @@ fun getMovies(): List<Movie> {
             trailer = "trailer_placeholder",
             rating = "9.5"),
 
-        Movie(
+        Movie(id = "tt2707408",
             title = "Narcos",
             year = "2015-",
             genre = "Biography, Crime, Drama",

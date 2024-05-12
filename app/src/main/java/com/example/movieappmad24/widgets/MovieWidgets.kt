@@ -32,6 +32,7 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,30 +59,28 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.example.movieappmad24.R
 import com.example.movieappmad24.models.Movie
-import com.example.movieappmad24.models.getMovies
+import com.example.movieappmad24.models.MovieWithImages
 import com.example.movieappmad24.navigation.Screen
 import com.example.movieappmad24.viewmodels.MoviesViewModel
-import java.lang.Exception
 
 
 @Composable
 fun MovieList(
     modifier: Modifier,
-    movies: List<Movie>,
     navController: NavController,
     viewModel: MoviesViewModel
 ){
+    val movies by viewModel.movies.collectAsState()
+
     LazyColumn(modifier = modifier) {
-        items(movies) { movie ->
+        items(movies) { movieWithImages ->
             MovieRow(
-                movie = movie,
-                onFavoriteClick = {movieId ->
-                    viewModel.toggleFavoriteMovie(movieId)
-                },
-                onItemClick = { movieId ->
-                    navController.navigate(route = Screen.DetailScreen.withId(movieId))
+                movieWithImages = movieWithImages,
+                onFavoriteClick = { movie ->
+                    viewModel.toggleFavoriteMovie(movie) },
+                onItemClick = { movie ->
+                    navController.navigate(route = Screen.DetailScreen.withId(movie.dbId))
                 }
             )
         }
@@ -91,28 +90,28 @@ fun MovieList(
 @Composable
 fun MovieRow(
     modifier: Modifier = Modifier,
-    movie: Movie,
-    onFavoriteClick: (Long) -> Unit = {},
-    onItemClick: (Long) -> Unit = {}
+    movieWithImages: MovieWithImages,
+    onFavoriteClick: (Movie) -> Unit = {},
+    onItemClick: (Movie) -> Unit = {}
 ){
     Card(modifier = modifier
         .fillMaxWidth()
         .padding(5.dp)
         .clickable {
-            onItemClick(movie.id)
+            onItemClick(movieWithImages.movie)
         },
         shape = ShapeDefaults.Large,
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
         Column {
-
+            println("Movie^^: " + movieWithImages)
             MovieCardHeader(
-                imageUrl = movie.images[0],
-                isFavorite = movie.isFavorite,
-                onFavoriteClick = { onFavoriteClick(movie.id) }
+                imageUrl = if (movieWithImages.images.isNotEmpty()) movieWithImages.images[0].url else "",
+                isFavorite = movieWithImages.movie.isFavorite,
+                onFavoriteClick = { onFavoriteClick(movieWithImages.movie) }
             )
 
-            MovieDetails(modifier = modifier.padding(12.dp), movie = movie)
+            MovieDetails(modifier = modifier.padding(12.dp), movieWithImages = movieWithImages)
 
         }
     }
@@ -240,7 +239,7 @@ fun FavoriteIcon(
 
 
 @Composable
-fun MovieDetails(modifier: Modifier, movie: Movie) {
+fun MovieDetails(modifier: Modifier, movieWithImages: MovieWithImages) {
     var showDetails by remember {
         mutableStateOf(false)
     }
@@ -252,7 +251,7 @@ fun MovieDetails(modifier: Modifier, movie: Movie) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = movie.title)
+        Text(text = movieWithImages.movie.title)
         Icon(modifier = Modifier
             .clickable {
                 showDetails = !showDetails
@@ -269,11 +268,11 @@ fun MovieDetails(modifier: Modifier, movie: Movie) {
         exit = fadeOut()
     ) {
         Column (modifier = modifier) {
-            Text(text = "Director: ${movie.director}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Released: ${movie.year}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Genre: ${movie.genre}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Actors: ${movie.actors}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Rating: ${movie.rating}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Director: ${movieWithImages.movie.director}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Released: ${movieWithImages.movie.year}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Genre: ${movieWithImages.movie.genre}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Actors: ${movieWithImages.movie.actors}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Rating: ${movieWithImages.movie.rating}", style = MaterialTheme.typography.bodySmall)
 
             Divider(modifier = Modifier.padding(3.dp))
 
@@ -282,7 +281,7 @@ fun MovieDetails(modifier: Modifier, movie: Movie) {
                     append("Plot: ")
                 }
                 withStyle(style = SpanStyle(color = Color.DarkGray, fontSize = 13.sp, fontWeight = FontWeight.Normal)){
-                    append(movie.plot)
+                    append(movieWithImages.movie.plot)
                 }
             })
         }
@@ -291,9 +290,9 @@ fun MovieDetails(modifier: Modifier, movie: Movie) {
 
 
 @Composable
-fun HorizontalScrollableImageView(movie: Movie) {
+fun HorizontalScrollableImageView(movieWithImages: MovieWithImages) {
     LazyRow {
-        items(movie.images) { image ->
+        items(movieWithImages.images) { image ->
             Card(
                 modifier = Modifier
                     .padding(12.dp)
@@ -303,7 +302,7 @@ fun HorizontalScrollableImageView(movie: Movie) {
 
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(image)
+                        .data(image.url)
                         .crossfade(true)
                         .build(),
                     contentDescription = "Movie poster",
