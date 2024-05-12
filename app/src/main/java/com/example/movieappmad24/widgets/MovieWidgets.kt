@@ -1,5 +1,6 @@
 package com.example.movieappmad24.widgets
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -73,8 +74,10 @@ fun MovieList(
 ){
     val movies by viewModel.movies.collectAsState()
 
+    println("movies: " + movies)
     LazyColumn(modifier = modifier) {
         items(movies) { movieWithImages ->
+
             MovieRow(
                 movieWithImages = movieWithImages,
                 onFavoriteClick = { movie ->
@@ -106,7 +109,7 @@ fun MovieRow(
         Column {
             println("Movie^^: " + movieWithImages)
             MovieCardHeader(
-                imageUrl = if (movieWithImages.images.isNotEmpty()) movieWithImages.images[0].url else "",
+                imageUrl = if (movieWithImages.images.isNotEmpty()) movieWithImages.images[0].url else "", // images always empty
                 isFavorite = movieWithImages.movie.isFavorite,
                 onFavoriteClick = { onFavoriteClick(movieWithImages.movie) }
             )

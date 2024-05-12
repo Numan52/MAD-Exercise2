@@ -1,5 +1,6 @@
 package com.example.movieappmad24.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieappmad24.data.MovieRepository
@@ -26,8 +27,10 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel(), Movi
         viewModelScope.launch {
             repository.getAllMovies().collect { movieList ->
                 _movies.value = movieList
+                Log.i("moviestest", movieList.toString())
             }
         }
+        Log.i("moviestest", movies.value.toString())
     }
 
     override fun toggleFavoriteMovie(movie: Movie) {
